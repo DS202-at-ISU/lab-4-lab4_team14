@@ -3,7 +3,44 @@ title: "Progress Report"
 author: "Alexa Elliott"
 date: "2022-04-17"
 output: html_document
-
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(Lahman)
+head(HallOfFame, 3)
+```
+
+```{r}
+HallOfFame %>% 
+  ggplot(aes(x = yearID, fill = inducted)) +
+  geom_bar() +
+  xlim(c(1936, 2022))
+```
+
+```{r}
+#library(rvest)
+url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
+html <- read_html(url)
+tables <- html_table(html)
+
+head(tables[[1]], 3)
+
+```
+
+
+```{r}
+write.csv(tables[[1]], "temp.csv", row.names=FALSE)
+backin <- readr::read_csv("temp.csv", skip = 1, show_col_types =FALSE)
+head(backin, 3)
+```
+
+```{r}
+readr::parse_number(c("34%", "10th", "1.0"))
+```
+
+
