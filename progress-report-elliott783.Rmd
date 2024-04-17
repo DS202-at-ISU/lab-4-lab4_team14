@@ -1,0 +1,9 @@
+---
+title: "Progress Report"
+author: "Alexa Elliott"
+date: "2022-04-17"
+output: html_document
+
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
