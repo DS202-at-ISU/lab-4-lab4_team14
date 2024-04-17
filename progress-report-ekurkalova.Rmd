@@ -7,6 +7,8 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(dplyr)
+library(ggplot2)
 ```
 
 # Lab report #4 - instructions
@@ -30,4 +32,45 @@ hof %>%
   ylab("Percent of votes")
 ```
 
+```{r}
+#view the rows of original table
+head(hof, 3)
+
+hof <- select(hof, playerID, votes, yearID)
+head(hof, 3)
+```
+
+
+```{r}
+library(rvest)
+url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
+html <- read_html(url)
+tables <- html_table(html)
+```
+
+```{r}
+#view the scraped table
+write.csv(tables[[1]], "temp.csv", row.names=FALSE)
+backin <- readr::read_csv("temp.csv", skip = 1, show_col_types =FALSE)
+head(backin, 3)
+```
+
+```{r}
+#clean scraped data
+backin <- select(backin, Name, Votes)
+backin$yearID <- 2023
+
+#change names and order to match
+backin <- backin %>%
+  rename(playerID = Name, votes = Votes)
+
+head(backin, 3)
+```
+
+```{r}
+#combine using rbind
+updated_hof <- rbind(hof, backin)
+
+write.csv(updated_hof, file="hof2023", row.names = FALSE)
+```
 
