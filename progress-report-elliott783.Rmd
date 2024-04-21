@@ -8,39 +8,81 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
+View(backin)
 
 ```{r}
 library(Lahman)
 head(HallOfFame, 3)
+head(HallOfFame)
+View(HallOfFame)
+
 ```
 
 ```{r}
-HallOfFame %>% 
-  ggplot(aes(x = yearID, fill = inducted)) +
-  geom_bar() +
-  xlim(c(1936, 2022))
+hof <- Lahman::HallOfFame
+hof %>% 
+  ggplot(aes(x = yearID, y = votes/needed*100, group=playerID)) +
+  geom_hline(yintercept = 100, colour="grey70") + 
+  geom_line() +
+  geom_point(aes(colour = "inducted"), 
+    data = hof %>% filter(inducted=="Y")) +
+  xlim(c(2000, 2022)) +
+  ylab("Percent of votes")
 ```
 
 ```{r}
-#library(rvest)
+#view the rows of original table
+head(hof, 3)
+
+hof <- select(hof, playerID,  votes, yearID)
+head(hof, 3)
+```
+
+
+```{r}
+library(rvest)
 url <- "https://www.baseball-reference.com/awards/hof_2023.shtml"
 html <- read_html(url)
 tables <- html_table(html)
-
-head(tables[[1]], 3)
-
 ```
 
-
 ```{r}
+#view the scraped table
 write.csv(tables[[1]], "temp.csv", row.names=FALSE)
 backin <- readr::read_csv("temp.csv", skip = 1, show_col_types =FALSE)
 head(backin, 3)
+View(backin)
+```
+
+
+```{r}
+#cleaning the scraped data
+backin <- select(backin, Name, Votes)
+backin$yearID <- 2023
+
+#change names and order to match
+backin <- backin %>%
+  rename(playerID = Name, votes = Votes)
+
+head(backin, 3)
+```
+
+
+```{r}
+#combine using rbind
+updated_hof <- rbind(hof, backin)
+
+write.csv(updated_hof, file="hof2023", row.names = FALSE)
 ```
 
 ```{r}
-readr::parse_number(c("34%", "10th", "1.0"))
+# Merge the datasets on playerID
+merged_data <- merge(hof, backin, by = "playerID", all.x = TRUE)
+
+# View the merged dataset
+View(merged_data)
 ```
+
+
 
 
